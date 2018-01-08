@@ -23,15 +23,20 @@
         <h2>COLEÇÃO </h2>
 
 
-    @foreach($videos as $video)
+    @foreach($videos as $canal)
+        @foreach($canal as $video)
 
-           <form action="{{url('collections/video')}}/{{$video->id}}", method="get" >
-               <h4 id="title"><a href='{{url('collections/video')}}/{{$video->id}}'>{{$video->title}}</a></h4>
-               <input type="image" name="submit" src="https://i4.ytimg.com/vi/{{$video->id}}/hqdefault.jpg"
-               alt="Submit"/>
-           </form>
+           <h4 id="title">
+
+               <a href='{{url('collections/video')}}/{{$video->id->videoId}}'>
+                   {{$video->snippet->title}}    -  data: {{$video->snippet->publishedAt}}<br>
+                   <img src="https://i4.ytimg.com/vi/{{$video->id->videoId}}/hqdefault.jpg"/>
+                </a>
+           </h4>
+
 
         @endforeach
+    @endforeach
     </div>
 
 </div>

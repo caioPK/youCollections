@@ -17,15 +17,19 @@ Route::get('/', function () {
 
 Route::resource('collections','CollectionController');
 
+
 Route::resource('collections/video','assistidosController',['names'=>[
     'show'=>'video'
 ]],['only'=>[
     'show','store','destroy'
 ]]);
+
+
+
 Route::resource('xmls','xmlController',['except'=>[
     'index'
 ]]);
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+//Route::get('/home', 'HomeController@index')->name('home');

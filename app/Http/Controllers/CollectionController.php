@@ -2,6 +2,8 @@
 
 namespace youCollections\Http\Controllers;
 
+//use Illuminate\Support\Collection;
+use Alaouy\Youtube\Facades\Youtube;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
@@ -24,7 +26,7 @@ class CollectionController extends Controller
      */
     public function index()
     {
-
+        //acessando apenas as coleções do usuario logado
         $collec = Collection::where('idUser', Auth::user()->id)->get();
 
         return View::make('collections.index')
@@ -38,6 +40,7 @@ class CollectionController extends Controller
      */
     public function create()
     {
+        //recuperando arquivo XML com canais
         $xml = xml::find(Auth::user()->id);
         $file = Storage::get($xml->filePath);
         $lista = simplexml_load_string($file);
@@ -52,28 +55,26 @@ class CollectionController extends Controller
      */
     public function store(Request $request)
     {
-            $collec = new Collection();
-            $collec->idUser     =   Auth::user()->id;
-            $collec->nomeCollec =   $request->get('name');
+        //recuperando string com url dos canais e tranformando em array
+        $lista = str_replace(',,','', $request->get('hlista'));
+        $urls = explode('@',$lista);
 
-            //pegando e salvando apenas os ids dos canais
-            $lista = str_replace(',,','', $request->get('hlista'));
-            $urls = explode('@',$lista);
+        //recuprando apenas os ids de canais para salvar
+        $canais = '';
+        foreach ($urls as $url){
+            $canal =  DB::table('channels')->where('url', $url)->value('idCanal');
+            $canais = $canal.",".$canais;
+        }
 
-                $canais = '';
-            foreach ($urls as $url){
-                $canal =  DB::table('channels')->where('url', $url)->value('idCanal');
-                $canais = $canal.",".$canais;
-            }
+        //salvando a nova coleção
+        $collec = new Collection();
+        $collec->idUser     =   Auth::user()->id;
+        $collec->nomeCollec =   $request->get('name');
+        $collec->canais     =  $canais;
+        $collec->save();
 
-            $collec->canais     =  $canais;
-
-
-
-            $collec->save();
-
-            Session::flash('message','Collection criada com sucesso');
-            return Redirect::to('collections');
+        Session::flash('message','Collection criada com sucesso');
+        return Redirect::to('collections/create');
     }
 
     /**
@@ -85,7 +86,7 @@ class CollectionController extends Controller
     public function show(Collection $collection)
     {
 
-        $videosA = videosAssistido::where('idUser', Auth::user()->id)->get();
+        $videosA = collect(videosAssistido::where('idUser', Auth::user()->id)->get());
         if($videosA){
             foreach ($videosA as $videoA){
                 $assistidos = $videoA->idVideo;
@@ -95,21 +96,19 @@ class CollectionController extends Controller
         $lista = str_replace(',,','', $collection->canais);
         $canais = explode(',',$lista);
 
-
+        //usar colletions chunk para subdivir o tamanho das paginas
         $i=0;
         foreach ($canais as $canal){
             $canal = DB::table('channels')->where('idCanal', $canal)->value('url');
-            $url = 'https://www.youtube.com/feeds/videos.xml?channel_id='.$canal;
-            $xml = simplexml_load_file($url);
-            foreach ($xml->entry as $video){
-                $urlVideo = $video->id;
-                $video->id = str_replace ("yt:video:", "", $video->id);
-                $feed[$i]= $video;
-                $i++;
-           }
+            $videoList = Youtube::listChannelVideos($canal,50);
+            $videos[$i]=$videoList;
+            $i++;
+
         }
 
-        return View::make('collections.show')->with('videos',$feed);
+
+        //return View::make('collections.show')->with('videos',$videos);
+        return \view('collections.show',['videos'=>$videos, 'assistidos'=>$assistidos]);
     }
 
     /**

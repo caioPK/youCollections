@@ -2,6 +2,7 @@
 
 namespace youCollections\Http\Controllers;
 
+use Alaouy\Youtube\Facades\Youtube;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
@@ -18,13 +19,20 @@ class assistidosController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $id)
     {
+        //função chamada quando o usuario clicar no botão MARCAR COMO VISTO
         if(videosAssistido::find($id)){
-            $teste =videosAssistido::where('idVideo',$id)->where('idUser',Auth::user()->id)->first();
-            $ids = Auth::user()->id;
-            if($teste){
-                echo 'já existe';
+
+            if(videosAssistido::where('idVideo',$id)->where('idUser',Auth::user()->id)->first()){
+
+            }else{
+                videosAssistido::create(
+                    [
+                        'idVideo' => $id,
+                        'idUser' => Auth::user()->id,
+                    ]
+                );
             }
 
         }else{
@@ -46,10 +54,16 @@ class assistidosController extends Controller
     public function show($id, Request $request)
     {
         if(videosAssistido::find($id)){
-            $teste =videosAssistido::where('idVideo',$id)->where('idUser',Auth::user()->id)->first();
-            $ids = Auth::user()->id;
-            if($teste){
-                echo 'já existe';
+
+            if(videosAssistido::where('idVideo',$id)->where('idUser',Auth::user()->id)->first()){
+               echo 'existe';
+            }else{
+                videosAssistido::create(
+                    [
+                        'idVideo' => $id,
+                        'idUser' => Auth::user()->id,
+                    ]
+                );
             }
 
         }else{
@@ -60,7 +74,9 @@ class assistidosController extends Controller
                 ]
             );
         }
-        return View::make('collections/video.show')->with('dados',$request);
+        $video = Youtube::getVideoInfo($id);
+
+        return View::make('collections/video.show')->with('dados',$video);
     }
 
     /**
