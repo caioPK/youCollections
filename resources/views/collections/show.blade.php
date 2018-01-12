@@ -2,20 +2,33 @@
 <html>
 <head>
     <title>YOUCOLLECTIONS</title>
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ asset('css/email.css') }}">
+    <link rel="stylesheet" href={{ asset('css/pure.css') }} integrity="sha384-" crossorigin="anonymous">
+
+
+
 </head>
 <body>
-<div class="container">
+<div id="layout" class="content pure-g">
+    <div id="nav" class="pure-u">
+        <a href="" class="nav-menu-button">menu</a>
 
-    <nav class="navbar navbar-inverse">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="{{ URL::to('collections') }}">Nerd Alert</a>
-        </div>
-        <ul class="nav navbar-nav">
-            <li><a href="{{ URL::to('collections') }}">View All Nerds</a></li>
-            <li><a href="{{ URL::to('collections/create') }}">Create a Nerd</a>
-        </ul>
-    </nav>
+        <nav class="nav-inner">
+            <a class="pure-menu-link" href="{{ URL::to('collections') }}">Nerd Alert</a>
+
+            <div class="pure-menu">
+                <ul class="peru-menu-list" style= 'list-style-type:none'>
+                    <li class="pure-menu-item">
+                        <a class="pure-menu-link" href="{{ URL::to('collections') }}">View All Nerds</a>
+                    </li>
+                    <li class="pure-menu-item">
+                        <a class="pure-menu-link" href="{{ URL::to('collections/create') }}">Create a Nerd</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
 
     <h1>Showing </h1>
 
@@ -40,5 +53,21 @@
     </div>
 
 </div>
+<script src="https://yui-s.yahooapis.com/3.18.1/build/yui/yui-min.js"></script>
+<script>
+    YUI().use('node-base', 'node-event-delegate', function (Y) {
+
+        var menuButton = Y.one('.nav-menu-button'),
+            nav        = Y.one('#nav');
+
+        // Setting the active class name expands the menu vertically on small screens.
+        menuButton.on('click', function (e) {
+            nav.toggleClass('active');
+        });
+
+        // Your application code goes here...
+
+    });
+</script>
 </body>
 </html>

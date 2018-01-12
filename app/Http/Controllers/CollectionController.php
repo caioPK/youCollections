@@ -101,6 +101,7 @@ class CollectionController extends Controller
         foreach ($canais as $canal){
             $canal = DB::table('channels')->where('idCanal', $canal)->value('url');
             $videoList = Youtube::listChannelVideos($canal,50);
+            //fazer uma colleção dos videos e a flag de visto
             $videos[$i]=$videoList;
             $i++;
 

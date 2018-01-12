@@ -2,6 +2,7 @@
 <head>
     <title>YOUCOLLECTIONS</title>
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ asset('css/email.css') }}">
 </head>
 <body>
 <div class="container">
